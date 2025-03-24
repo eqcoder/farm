@@ -36,36 +36,36 @@ final Schema schema = Schema.object(
     ),
   },
 );
-class FlowerClusterDataScaler{
-  ListView.builder(
-      itemCount: _data.length,
-      itemBuilder: (context, rowIndex) {
-        final rowData = _data[rowIndex];
-        return Row(
-          children: rowData.asMap().entries.map((entry) {
-            final colIndex = entry.key;
-            final cellData = entry.value;
-            double width = 100.0; // 기본 셀 너비
+// class FlowerClusterDataScaler{
+//   ListView.builder(
+//       itemCount: _data.length,
+//       itemBuilder: (context, rowIndex) {
+//         final rowData = _data[rowIndex];
+//         return Row(
+//           children: rowData.asMap().entries.map((entry) {
+//             final colIndex = entry.key;
+//             final cellData = entry.value;
+//             double width = 100.0; // 기본 셀 너비
 
-            if (rowIndex == 2 && colIndex == 1) {
-              width = 200.0; // "Data 5 and 6" 셀 너비
-            }
+//             if (rowIndex == 2 && colIndex == 1) {
+//               width = 200.0; // "Data 5 and 6" 셀 너비
+//             }
 
-            return Container(
-              width: width,
-              padding: EdgeInsets.all(8.0),
-              decoration: BoxDecoration(
-                border: Border.all(),
-              ),
-              child: Text(cellData),
-            );
-          }).toList(),
-        );
-      },
-    );
-  }
-}
-}
+//             return Container(
+//               width: width,
+//               padding: EdgeInsets.all(8.0),
+//               decoration: BoxDecoration(
+//                 border: Border.all(),
+//               ),
+//               child: Text(cellData),
+//             );
+//           }).toList(),
+//         );
+//       },
+//     );
+//   }
+// }
+// }
 class Tomato extends CropDefault{
   Tomato(super.data);
 

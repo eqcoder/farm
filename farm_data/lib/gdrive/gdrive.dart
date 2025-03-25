@@ -12,9 +12,9 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:path/path.dart' as p;
 
-const _clientId = "455278327943-k1o8o9nm6bs41trsbppuoaof19c136eb.apps.googleusercontent.com";
+const _clientId =
+    "455278327943-k1o8o9nm6bs41trsbppuoaof19c136eb.apps.googleusercontent.com";
 const _scopes = ['https://www.googleapis.com/auth/drive.file'];
-
 
 class SecureStorage {
   final storage = FlutterSecureStorage();
@@ -40,7 +40,10 @@ class SecureStorage {
     return storage.deleteAll();
   }
 }
+
 class GoogleDrive {
+  static final GoogleDrive instance = GoogleDrive._internal();
+  GoogleDrive._internal();
   final storage = SecureStorage();
   //Get Authenticated Http Client
   Future<http.Client> getHttpClient() async {
@@ -49,33 +52,45 @@ class GoogleDrive {
     if (credentials == null) {
       //Needs user authentication
       var authClient = await clientViaUserConsent(
-          ClientId(_clientId),_scopes, (url) {
-        //Open Url in Browser
-        launch(url);
-      });
+        ClientId(_clientId),
+        _scopes,
+        (url) {
+          //Open Url in Browser
+          launch(url);
+        },
+      );
       //Save Credentials
-      await storage.saveCredentials(authClient.credentials.accessToken,
-          authClient.credentials.refreshToken!);
+      await storage.saveCredentials(
+        authClient.credentials.accessToken,
+        authClient.credentials.refreshToken!,
+      );
       return authClient;
     } else {
       print(credentials["expiry"]);
       //Already authenticated
       return authenticatedClient(
-          http.Client(),
-          AccessCredentials(
-              AccessToken(credentials["type"], credentials["data"],
-                  DateTime.tryParse(credentials["expiry"])!),
-              credentials["refreshToken"],
-              _scopes));
+        http.Client(),
+        AccessCredentials(
+          AccessToken(
+            credentials["type"],
+            credentials["data"],
+            DateTime.tryParse(credentials["expiry"])!,
+          ),
+          credentials["refreshToken"],
+          _scopes,
+        ),
+      );
     }
   }
 
-// check if the directory forlder is already available in drive , if available return its id
-// if not available create a folder in drive and return id
-//   if not able to create id then it means user authetication has failed
-  Future<String?> _getFolderId(drive.DriveApi driveApi) async {
+  // check if the directory forlder is already available in drive , if available return its id
+  // if not available create a folder in drive and return id
+  //   if not able to create id then it means user authetication has failed
+  Future<String?> _getFolderId(
+    drive.DriveApi driveApi,
+    String folderName,
+  ) async {
     final mimeType = "application/vnd.google-apps.folder";
-    String folderName = "조사사진";
 
     try {
       final found = await driveApi.files.list(
@@ -107,30 +122,24 @@ class GoogleDrive {
     }
   }
 
-  
-  uploadFileToGoogleDrive(List<File?> files) async {
+  uploadFileToGoogleDrive(List<File?> files, String folderName) async {
     var client = await getHttpClient();
     var gdrive = drive.DriveApi(client);
-    String? folderId =  await _getFolderId(gdrive);
-    if(folderId == null){
+    String? folderId = await _getFolderId(gdrive, folderName);
+    if (folderId == null) {
       print("Sign-in first Error");
-    }else {
+    } else {
       drive.File fileToUpload = drive.File();
       fileToUpload.parents = [folderId];
-      for(var file in files){
-
-      fileToUpload.name = p.basename(file!.absolute.path);
-      var response = await gdrive.files.create(
-        fileToUpload,
-        uploadMedia: drive.Media(file.openRead(), file.lengthSync()),
-      );
-      print(response);
-      };
+      for (var file in files) {
+        fileToUpload.name = p.basename(file!.absolute.path);
+        var response = await gdrive.files.create(
+          fileToUpload,
+          uploadMedia: drive.Media(file.openRead(), file.lengthSync()),
+        );
+        print(response);
+      }
+      ;
     }
-
   }
-
-
-
-
 }

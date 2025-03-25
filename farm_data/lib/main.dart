@@ -5,13 +5,18 @@ import 'extract_data/gemini.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'extract_data/clean_image.dart';
 import 'dart:io';
+import 'business_trip/business_trip_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await windowManager.ensureInitialized();
+  if (Platform.isWindows) {
+    await windowManager.ensureInitialized();
+    initWindows();
+    windowManager.setFullScreen(true);
+  }
   await dotenv.load(fileName: '.env');
   // await extractData('D:/Desktop/farm/farm_data/tomato1.JPG');
-  initWindows();
+
   runApp(const AgriculturalBigdataApp());
 }
 
@@ -19,6 +24,7 @@ void main() async {
 
 Future<void> initWindows() async {
   // `window_manager` 초기화
+
   await windowManager.ensureInitialized();
 
   const windowOptions = WindowOptions(
@@ -98,7 +104,10 @@ class _MainScreenState extends State<MainScreen> {
       ),
       body: Column(
         children: [
-          Expanded(flex: 2, child: Container(color: Colors.green)),
+          Expanded(
+            flex: 2,
+            child: Container(color: const Color.fromARGB(255, 255, 255, 255)),
+          ),
           Expanded(
             flex: 5,
             child: Padding(
@@ -111,6 +120,12 @@ class _MainScreenState extends State<MainScreen> {
                   Expanded(
                     flex: 2, // 가로 공간의 2/3 차지
                     child: _buildRoundedButton(context, '출장', () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder:
+                              (BuildContext context) => BusinessTripScreen(),
+                        ),
+                      );
                       print('출장버튼 클릭');
                     }),
                   ),
@@ -169,7 +184,10 @@ class _MainScreenState extends State<MainScreen> {
               ),
             ),
           ),
-          Expanded(flex: 2, child: Container(color: Colors.green)),
+          Expanded(
+            flex: 2,
+            child: Container(color: const Color.fromARGB(255, 255, 255, 255)),
+          ),
         ],
       ),
       bottomNavigationBar: const BottomAppBar(
@@ -222,7 +240,11 @@ Widget _buildRoundedButton(
           vertical: 12,
         ), // 버튼 내부 패딩 조정
       ),
-      child: Text(text, textAlign: TextAlign.center),
+      child: Text(
+        text,
+        style: TextStyle(fontSize: 32),
+        textAlign: TextAlign.center,
+      ),
     ),
   );
 }

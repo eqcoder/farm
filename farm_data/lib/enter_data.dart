@@ -268,7 +268,7 @@ class _WindowsEnterWidgetState extends State<WindowsEnterDataLayout> {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(1.0),
-      child: Column(
+      child: Row(
         children: [
           // 좌측 영역
           Expanded(

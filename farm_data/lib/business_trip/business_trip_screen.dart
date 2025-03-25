@@ -1,4 +1,4 @@
-import 'package:farm_data/business_trip/camera.dart';
+import 'package:farm_data/business_trip/crop_photo.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -83,44 +83,43 @@ class _BusinessTripScreenState extends State<BusinessTripScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text(selectedFarm ?? "농가 선택")),
-      body: Expanded(child:Column(
-        children: [
-          DropdownButton<String>(
-            value: selectedFarm,
-            hint: Text("농가 선택"),
-            items: farmNames.map((String farm) {
-              return DropdownMenuItem<String>(
-                value: farm,
-                child: Text(farm),
-              );
-            }).toList(),
-            onChanged: (value) async {
-              setState(() {
-                selectedFarm = value;
-              });
-              await _fetchWeather();
-            },
-          ),
-          Text("현재 날씨: $weatherInfo"),
-          ElevatedButton(
-            onPressed: _openGoogleMaps,
-            child: Text("길안내"),
-          ),
-          ElevatedButton(
-            onPressed: _openOpinet,
-            child: Text("오피넷"),
-          ),
-          ElevatedButton(
-            onPressed:(){Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder:
-                                    (BuildContext context) => CropPhotoScreen(),
-                              ),
-                            );},
-            child: Text("오피넷"),
-          ),
-        ],
-      ),)
+      body: Expanded(
+        child: Column(
+          children: [
+            DropdownButton<String>(
+              value: selectedFarm,
+              hint: Text("농가 선택"),
+              items:
+                  farmNames.map((String farm) {
+                    return DropdownMenuItem<String>(
+                      value: farm,
+                      child: Text(farm),
+                    );
+                  }).toList(),
+              onChanged: (value) async {
+                setState(() {
+                  selectedFarm = value;
+                });
+                await _fetchWeather();
+              },
+            ),
+            Text("현재 날씨: $weatherInfo"),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (BuildContext context) => CropPhotoScreen(),
+                  ),
+                );
+              },
+
+              child: Text("조사사진 촬영"),
+            ),
+            ElevatedButton(onPressed: _openOpinet, child: Text("길안내")),
+            ElevatedButton(onPressed: _openGoogleMaps, child: Text("오피넷")),
+          ],
+        ),
+      ),
     );
   }
 }

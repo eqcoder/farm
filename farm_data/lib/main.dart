@@ -1,32 +1,21 @@
-import 'dart:io';
-import 'package:farm_data/business_trip/business_trip_screen.dart';
-import 'package:farm_data/provider.dart';
 import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
-import 'package:flutter/foundation.dart';
 import 'enter_data.dart';
 import 'extract_data/gemini.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'extract_data/clean_image.dart';
-import 'business_trip/camera.dart';
-import 'farm_info/farm_info_screen.dart';
-import 'package:provider/provider.dart';
-import 'provider.dart';
-
+import 'dart:io';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  if (!kIsWeb && (Platform.isWindows || Platform.isMacOS || Platform.isLinux)) {
+  await windowManager.ensureInitialized();
   await dotenv.load(fileName: '.env');
-  initWindows();}
-  else{
-    WidgetsFlutterBinding.ensureInitialized();
-  }
   // await extractData('D:/Desktop/farm/farm_data/tomato1.JPG');
-  runApp(
-    ChangeNotifierProvider(create: (context) => provider(),
-      child:const AgriculturalBigdataApp()));
+  initWindows();
+  runApp(const AgriculturalBigdataApp());
 }
+
+// 클래스 추
 
 Future<void> initWindows() async {
   // `window_manager` 초기화
@@ -53,8 +42,6 @@ class AgriculturalBigdataApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final _provider = Provider.of<provider>(context);
-
     return MaterialApp(
       title: '농업빅데이터조사',
       theme: ThemeData(
@@ -109,10 +96,82 @@ class _MainScreenState extends State<MainScreen> {
           ),
         ],
       ),
-      body: Center(
-        child: Platform.isAndroid
-            ? AndroidLayout()
-            : WindowsLayout(),),
+      body: Column(
+        children: [
+          Expanded(flex: 2, child: Container(color: Colors.green)),
+          Expanded(
+            flex: 5,
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // 2x2 크기의 버튼
+                  Expanded(
+                    flex: 2, // 가로 공간의 2/3 차지
+                    child: _buildRoundedButton(context, '출장', () {
+                      print('출장버튼 클릭');
+                    }),
+                  ),
+                  const SizedBox(width: 10),
+                  // 1x1 크기의 버튼 4개
+                  Expanded(
+                    flex: 2,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: _buildRoundedButton(context, '데이터 입력', () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder:
+                                    (BuildContext context) => EnterDataScreen(),
+                              ),
+                            );
+                            print('데이터 입력 클릭');
+                          }),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          flex: 1,
+                          child: _buildRoundedButton(context, '버튼 2', () {
+                            print('버튼 2 클릭');
+                          }),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    flex: 2,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Expanded(
+                          flex: 1,
+                          child: _buildRoundedButton(context, '버튼 2', () {
+                            print('버튼 2 클릭');
+                          }),
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          flex: 1,
+                          child: _buildRoundedButton(context, '버튼 2', () {
+                            print('버튼 2 클릭');
+                          }),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Expanded(flex: 2, child: Container(color: Colors.green)),
+        ],
+      ),
       bottomNavigationBar: const BottomAppBar(
         // BottomAppBar를 사용하여 바닥에 공간 확보
         child: Padding(
@@ -133,194 +192,6 @@ class _MainScreenState extends State<MainScreen> {
   }
 }
 
-class WindowsLayout extends StatelessWidget {
-    @override
-    Widget build(BuildContext context) {
-    return
-    Column(
-        children: [
-          Expanded(flex: 2, child: Container(color: Colors.green)),
-          Expanded(
-            flex: 5,
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // 2x2 크기의 버튼
-                  Expanded(
-                    flex: 2, // 가로 공간의 2/3 차지
-                    child: _buildRoundedButton(context, '출장', () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder:
-                                    (BuildContext context) => BusinessTripScreen(),
-                              ),
-                            );
-                            print('데이터 입력 클릭');
-                          }),
-                  ),
-                  const SizedBox(width: 10),
-                  // 1x1 크기의 버튼 4개
-                  Expanded(
-                    flex: 2,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Expanded(
-                          flex: 1,
-                          child: _buildRoundedButton(context, '데이터 입력', () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder:
-                                    (BuildContext context) => EnterDataScreen(),
-                              ),
-                            );
-                            print('데이터 입력 클릭');
-                          }),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          flex: 1,
-                          child: _buildRoundedButton(context, '농가정보', () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder:
-                                    (BuildContext context) => FarmInfoScreen(),
-                              ),
-                            );
-                          }
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    flex: 2,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Expanded(
-                          flex: 1,
-                          child: _buildRoundedButton(context, '버튼 2', () {
-                            print('버튼 2 클릭');
-                          }),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          flex: 1,
-                          child: _buildRoundedButton(context, '버튼 2', () {
-                            print('버튼 2 클릭');
-                          }),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Expanded(flex: 2, child: Container(color: Colors.green)),
-        ],
-      );
-  }}
-
-class AndroidLayout extends StatelessWidget {
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-        children: [
-          Expanded(flex: 1, child: Container(color: const Color.fromARGB(255, 255, 255, 255))),
-          Expanded(
-            flex: 20,
-            child: Padding(
-              padding: const EdgeInsets.all(10.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // 2x2 크기의 버튼
-                  Expanded(
-                    flex: 2, // 가로 공간의 2/3 차지
-                    child: _buildRoundedButton(context, '출장', () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder:
-                                    (BuildContext context) => BusinessTripScreen(),
-                              ),
-                            );
-                            print('데이터 입력 클릭');
-                          }),
-                  ),
-                  const SizedBox(width: 20),
-                  // 1x1 크기의 버튼 4개
-                  Expanded(
-                    flex: 2,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Expanded(
-                          flex: 1,
-                          child: _buildRoundedButton(context, '데이터 입력', () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder:
-                                    (BuildContext context) => EnterDataScreen(),
-                              ),
-                            );
-                            print('데이터 입력 클릭');
-                          }),
-                        ),
-                        const SizedBox(width: 20),
-                        Expanded(
-                          flex: 1,
-                          child: _buildRoundedButton(context, '농가정보', () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder:
-                                    (BuildContext context) => FarmInfoScreen(),
-                              ),
-                            );
-                          }
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 20),
-                  Expanded(
-                    flex: 2,
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Expanded(
-                          flex: 1,
-                          child: _buildRoundedButton(context, '버튼 2', () {
-                            print('버튼 2 클릭');
-                          }),
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          flex: 1,
-                          child: _buildRoundedButton(context, '버튼 2', () {
-                            print('버튼 2 클릭');
-                          }),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Expanded(flex: 1, child: Container(color: const Color.fromARGB(255, 255, 255, 255))),
-        ],
-      );
-  }}
-
 Widget _buildRoundedButton(
   BuildContext context,
   String text,
@@ -329,7 +200,7 @@ Widget _buildRoundedButton(
   return Container(
     decoration: BoxDecoration(
       color: Colors.white,
-      borderRadius: BorderRadius.circular(4.0),
+      borderRadius: BorderRadius.circular(8.0),
       boxShadow: [
         BoxShadow(
           color: Colors.grey,

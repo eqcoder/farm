@@ -6,6 +6,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'extract_data/clean_image.dart';
 import 'dart:io';
 import 'business_trip/business_trip_screen.dart';
+import 'farm_info/farm_info_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -151,7 +152,13 @@ class _MainScreenState extends State<MainScreen> {
                         const SizedBox(width: 10),
                         Expanded(
                           flex: 1,
-                          child: _buildRoundedButton(context, '버튼 2', () {
+                          child: _buildRoundedButton(context, '농가정보보', () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder:
+                                    (BuildContext context) => FarmInfoScreen(),
+                              ),
+                            );
                             print('버튼 2 클릭');
                           }),
                         ),

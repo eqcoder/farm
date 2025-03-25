@@ -28,7 +28,7 @@ class _BusinessTripScreenState extends State<BusinessTripScreen> {
   }
 
   Future<void> _loadFarmNames() async {
-    farmNames = await DatabaseHelper.instance.getFarmNames();
+    farmNames = await FarmDatabase.instance.getFarmNames();
     if (farmNames.isNotEmpty) {
       selectedFarm = farmNames.first;
       await _fetchWeather();
@@ -108,7 +108,7 @@ class _BusinessTripScreenState extends State<BusinessTripScreen> {
               onPressed: () {
                 Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (BuildContext context) => CropPhotoScreen(),
+                    builder: (BuildContext context) => CropPhotoScreen(selectedFarm: selectedFarm!),
                   ),
                 );
               },

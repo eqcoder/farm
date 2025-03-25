@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
+import '../database.dart';
 
 
 class FarmInfoScreen extends StatefulWidget {
@@ -10,8 +11,12 @@ class FarmInfoScreen extends StatefulWidget {
 }
 
 class _FarmInfoScreenState extends State<FarmInfoScreen> {
-  List<Map<String, dynamic>> farms = [];
-
+  List<Farm> farms = [];
+  Farm? selectedFarm;
+  final _formKey = GlobalKey<FormState>();
+  TextEditingController _nameController = TextEditingController();
+  TextEditingController _cropController = TextEditingController();
+  TextEditingController _addressController = TextEditingController();
   @override
   void initState() {
     super.initState();
@@ -19,78 +24,146 @@ class _FarmInfoScreenState extends State<FarmInfoScreen> {
   }
 
   Future<void> _loadFarms() async {
-    farms = await DatabaseHelper.instance.getFarms();
+    farms = await FarmDatabase.instance.getAllFarms();
     setState(() {});
   }
 
-  Future<void> _editFarm(Map<String, dynamic> farm) async {
-    await showDialog(
+   _openFarmDialog({Farm? farm}) {
+    if (farm != null) {
+      _nameController.text = farm.name;
+      _cropController.text = farm.crop;
+      _addressController.text = farm.address;
+      selectedFarm = farm;
+    } else {
+      _nameController.clear();
+      _cropController.clear();
+      _addressController.clear();
+      selectedFarm = null;
+    }
+
+    showDialog(
       context: context,
-      builder: (context) => FarmDialog(
-        farm: farm,
-        onSave: (updatedFarm) async {
-          await DatabaseHelper.instance.updateFarm(updatedFarm);
-          await _loadFarms();
-        },
-      ),
+      builder: (context) {
+        return AlertDialog(
+          title: Text(farm == null ? '농가 추가' : '농가 수정'),
+          content: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: _nameController,
+                  decoration: InputDecoration(labelText: '농가명'),
+                  validator: (value) => value!.isEmpty ? '농가명을 입력하세요' : null,
+                ),
+                TextFormField(
+                  controller: _cropController,
+                  decoration: InputDecoration(labelText: '작물'),
+                  validator: (value) => value!.isEmpty ? '작물을 입력하세요' : null,
+                ),
+                TextFormField(
+                  controller: _addressController,
+                  decoration: InputDecoration(labelText: '주소'),
+                  validator: (value) => value!.isEmpty ? '주소를 입력하세요' : null,
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('취소'),
+            ),
+            TextButton(
+              onPressed: () {
+                if (_formKey.currentState!.validate()) {
+                  _saveFarm();
+                  Navigator.of(context).pop();
+                }
+              },
+              child: Text(farm == null ? '추가' : '수정'),
+            ),
+          ],
+        );
+      },
     );
   }
 
-  Future<void> _addFarm() async {
-    await showDialog(
-      context: context,
-      builder: (context) => FarmDialog(
-        onSave: (newFarm) async {
-          await DatabaseHelper.instance.insertFarm(newFarm);
-          await _loadFarms();
-        },
-      ),
-    );
+  _saveFarm() async {
+    String name = _nameController.text;
+    String crop = _cropController.text;
+    String address = _addressController.text;
+
+    if (selectedFarm == null) {
+      // 새로운 농가 추가
+      Farm newFarm = Farm(name: name, crop: crop, address: address);
+      await FarmDatabase.instance.insertFarm(newFarm);
+    } else {
+      // 기존 농가 수정
+      Farm updatedFarm = Farm(
+        id: selectedFarm!.id,
+        name: name,
+        crop: crop,
+        address: address,
+      );
+      await FarmDatabase.instance.updateFarm(updatedFarm);
+    }
+
+    _loadFarms(); // 데이터 다시 로드
   }
+
+  _onRowSelected(Farm farm) {
+    setState(() {
+      selectedFarm = farm;
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("농가 관리")),
+      appBar: AppBar(title: Text('농가 데이터')),
       body: Column(
         children: [
-          Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: DataTable(
-                columns: [
-                  DataColumn(label: Text("농가명")),
-                  DataColumn(label: Text("작물명")),
-                  DataColumn(label: Text("지난 조사일")),
-                  DataColumn(label: Text("주소")),
-                  DataColumn(label: Text("편집")),
-                ],
-                rows: farms.map((farm) {
-                  return DataRow(cells: [
-                    DataCell(Text(farm['name'])),
-                    DataCell(Text(farm['crop'])),
-                    DataCell(Text(farm['lastSurveyDate'] ?? "없음")),
-                    DataCell(Text(farm['address'])),
-                    DataCell(
-                      IconButton(
-                        icon: Icon(Icons.edit),
-                        onPressed: () => _editFarm(farm),
-                      ),
-                    ),
-                  ]);
-                }).toList(),
-              ),
-            ),
-          ),
           ElevatedButton(
-            onPressed: _addFarm,
-            child: Text("농가 추가"),
+            onPressed: () => _openFarmDialog(), // 농가 추가 다이얼로그
+            child: Text('농가 추가'),
+          ),
+          if (selectedFarm != null)
+            ElevatedButton(
+              onPressed: () => _openFarmDialog(farm: selectedFarm!), // 농가 수정 다이얼로그
+              child: Text('정보 수정'),
+            ),
+          Expanded(
+            child: ListView(
+              children: [
+                DataTable(
+                  columns: [
+                    DataColumn(label: Text('농가명')),
+                    DataColumn(label: Text('작물')),
+                    DataColumn(label: Text('주소')),
+                  ],
+                  rows: farms.map((farm) {
+                    return DataRow(
+                      onSelectChanged: (_) => _onRowSelected(farm),
+                      cells: [
+                        DataCell(Text(farm.name)),
+                        DataCell(Text(farm.crop)),
+                        DataCell(Text(farm.address)),
+                      ],
+                    );
+                  }).toList(),
+                ),
+              ],
+            ),
           ),
         ],
       ),
     );
   }
-}
+  }
 
 /// 📌 농가 정보 입력/수정 다이얼로그
 class FarmDialog extends StatefulWidget {
@@ -168,55 +241,6 @@ class _FarmDialogState extends State<FarmDialog> {
         TextButton(onPressed: () => Navigator.of(context).pop(), child: Text("취소")),
         ElevatedButton(onPressed: _save, child: Text("저장")),
       ],
-    );
-  }
-}
-
-/// 📌 SQLite 데이터베이스 관리
-class DatabaseHelper {
-  static final DatabaseHelper instance = DatabaseHelper._init();
-  static Database? _database;
-
-  DatabaseHelper._init();
-
-  Future<void> initDatabase() async {
-    if (_database != null) return;
-
-    String path = p.join(await getDatabasesPath(), 'farm.db');
-    _database = await openDatabase(
-      path,
-      version: 1,
-      onCreate: (db, version) async {
-        await db.execute('''
-          CREATE TABLE farms (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            crop TEXT NOT NULL,
-            lastSurveyDate TEXT,
-            address TEXT NOT NULL
-          )
-        ''');
-      },
-    );
-  }
-
-  Future<List<Map<String, dynamic>>> getFarms() async {
-    final db = _database!;
-    return await db.query('farms');
-  }
-
-  Future<void> insertFarm(Map<String, dynamic> farm) async {
-    final db = _database!;
-    await db.insert('farms', farm);
-  }
-
-  Future<void> updateFarm(Map<String, dynamic> farm) async {
-    final db = _database!;
-    await db.update(
-      'farms',
-      farm,
-      where: 'id = ?',
-      whereArgs: [farm['id']],
     );
   }
 }

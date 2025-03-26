@@ -7,8 +7,8 @@ class CropDefault {
   Map<String, dynamic>? data;
   String? category;
   String? fileName;
-  
-  CropDefault(Map<String, dynamic> data){
+
+  CropDefault(Map<String, dynamic> data) {
     cropName = data['작물명'];
     name = data['조사자'];
     farmName = data['농가명'];
@@ -16,11 +16,10 @@ class CropDefault {
     date = data['조사일'];
     data = data['data'];
   }
-
-
 }
 
-class DataScaler{
+class DataScaler {
   Map<String, dynamic> data;
   DataScaler(this.data);
 }
+

@@ -7,13 +7,7 @@ int getRed(int pixel) => (pixel >> 16) & 0xFF;
 int getGreen(int pixel) => (pixel >> 8) & 0xFF;
 int getBlue(int pixel) => pixel & 0xFF;
 
-Image cleanImage(String filePath) {
-  // Load the image
-  final imageFile = File(filePath);
-  if (!imageFile.existsSync()) {
-    throw Exception('Image file not found at the specified path.');
-  }
-  Uint8List imageBytes = imageFile.readAsBytesSync();
+Image cleanImage(Uint8List imageBytes) {
   Image? image = decodeImage(imageBytes);
   if (image == null) {
     throw Exception('Failed to decode the image.');
@@ -22,8 +16,8 @@ Image cleanImage(String filePath) {
   // Define color ranges for masking
   final redMin = [140, 0, 0];
   final redMax = [255, 140, 140];
-  final grayMin = [190, 190, 190];
-  final grayMax = [255, 255, 230];
+  // final grayMin = [190, 190, 190];
+  // final grayMax = [255, 255, 230];
 
   // Apply red mask
   for (int y = 0; y < image.height; y++) {

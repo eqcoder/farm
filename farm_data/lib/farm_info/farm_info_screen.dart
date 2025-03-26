@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:path/path.dart' as p;
 import '../database.dart';
 
-
 class FarmInfoScreen extends StatefulWidget {
   @override
   _FarmInfoScreenState createState() => _FarmInfoScreenState();
@@ -28,7 +27,7 @@ class _FarmInfoScreenState extends State<FarmInfoScreen> {
     setState(() {});
   }
 
-   _openFarmDialog({Farm? farm}) {
+  _openFarmDialog({Farm? farm}) {
     if (farm != null) {
       _nameController.text = farm.name;
       _cropController.text = farm.crop;
@@ -120,7 +119,6 @@ class _FarmInfoScreenState extends State<FarmInfoScreen> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -133,7 +131,8 @@ class _FarmInfoScreenState extends State<FarmInfoScreen> {
           ),
           if (selectedFarm != null)
             ElevatedButton(
-              onPressed: () => _openFarmDialog(farm: selectedFarm!), // 농가 수정 다이얼로그
+              onPressed:
+                  () => _openFarmDialog(farm: selectedFarm!), // 농가 수정 다이얼로그
               child: Text('정보 수정'),
             ),
           Expanded(
@@ -145,16 +144,17 @@ class _FarmInfoScreenState extends State<FarmInfoScreen> {
                     DataColumn(label: Text('작물')),
                     DataColumn(label: Text('주소')),
                   ],
-                  rows: farms.map((farm) {
-                    return DataRow(
-                      onSelectChanged: (_) => _onRowSelected(farm),
-                      cells: [
-                        DataCell(Text(farm.name)),
-                        DataCell(Text(farm.crop)),
-                        DataCell(Text(farm.address)),
-                      ],
-                    );
-                  }).toList(),
+                  rows:
+                      farms.map((farm) {
+                        return DataRow(
+                          onSelectChanged: (_) => _onRowSelected(farm),
+                          cells: [
+                            DataCell(Text(farm.name)),
+                            DataCell(Text(farm.crop)),
+                            DataCell(Text(farm.address)),
+                          ],
+                        );
+                      }).toList(),
                 ),
               ],
             ),
@@ -163,7 +163,7 @@ class _FarmInfoScreenState extends State<FarmInfoScreen> {
       ),
     );
   }
-  }
+}
 
 /// 📌 농가 정보 입력/수정 다이얼로그
 class FarmDialog extends StatefulWidget {
@@ -198,7 +198,8 @@ class _FarmDialogState extends State<FarmDialog> {
         'id': widget.farm?['id'],
         'name': name,
         'crop': crop,
-        'lastSurveyDate': widget.farm?['lastSurveyDate'] ??
+        'lastSurveyDate':
+            widget.farm?['lastSurveyDate'] ??
             DateFormat('yyyy-MM-dd').format(DateTime.now()),
         'address': address,
       });
@@ -224,7 +225,10 @@ class _FarmDialogState extends State<FarmDialog> {
             DropdownButtonFormField<String>(
               value: crop,
               decoration: InputDecoration(labelText: "작물명"),
-              items: crops.map((c) => DropdownMenuItem(value: c, child: Text(c))).toList(),
+              items:
+                  crops
+                      .map((c) => DropdownMenuItem(value: c, child: Text(c)))
+                      .toList(),
               onChanged: (value) => setState(() => crop = value),
               validator: (value) => value == null ? "작물명을 선택하세요" : null,
             ),
@@ -238,7 +242,10 @@ class _FarmDialogState extends State<FarmDialog> {
         ),
       ),
       actions: [
-        TextButton(onPressed: () => Navigator.of(context).pop(), child: Text("취소")),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text("취소"),
+        ),
         ElevatedButton(onPressed: _save, child: Text("저장")),
       ],
     );

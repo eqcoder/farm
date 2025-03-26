@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
-import 'enter_data.dart';
-import 'extract_data/gemini.dart';
+import 'extract_data/enter_data.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'extract_data/clean_image.dart';
 import 'dart:io';
 import 'business_trip/business_trip_screen.dart';
 import 'farm_info/farm_info_screen.dart';
@@ -106,20 +104,20 @@ class _MainScreenState extends State<MainScreen> {
       body: Column(
         children: [
           Expanded(
-            flex: 2,
+            flex: 4,
             child: Container(color: const Color.fromARGB(255, 255, 255, 255)),
           ),
           Expanded(
-            flex: 5,
+            flex: 2,
             child: Padding(
               padding: const EdgeInsets.all(10.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // 2x2 크기의 버튼
+                  Spacer(flex: 2),
                   Expanded(
-                    flex: 2, // 가로 공간의 2/3 차지
+                    flex: 5, // 가로 공간의 2/3 차지
                     child: _buildRoundedButton(context, '출장', () {
                       Navigator.of(context).push(
                         MaterialPageRoute(
@@ -130,69 +128,94 @@ class _MainScreenState extends State<MainScreen> {
                       print('출장버튼 클릭');
                     }),
                   ),
-                  const SizedBox(width: 10),
-                  // 1x1 크기의 버튼 4개
+                  Spacer(flex: 1),
                   Expanded(
-                    flex: 2,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Expanded(
-                          flex: 1,
-                          child: _buildRoundedButton(context, '데이터 입력', () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder:
-                                    (BuildContext context) => EnterDataScreen(),
-                              ),
-                            );
-                            print('데이터 입력 클릭');
-                          }),
+                    flex: 5,
+                    child: _buildRoundedButton(context, '야장추출', () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (BuildContext context) => EnterDataScreen(),
                         ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          flex: 1,
-                          child: _buildRoundedButton(context, '농가정보보', () {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                builder:
-                                    (BuildContext context) => FarmInfoScreen(),
-                              ),
-                            );
-                            print('버튼 2 클릭');
-                          }),
-                        ),
-                      ],
-                    ),
+                      );
+                      print('데이터 입력 클릭');
+                    }),
                   ),
-                  const SizedBox(width: 10),
+                  Spacer(flex: 1),
                   Expanded(
-                    flex: 2,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Expanded(
-                          flex: 1,
-                          child: _buildRoundedButton(context, '버튼 2', () {
-                            print('버튼 2 클릭');
-                          }),
+                    flex: 5,
+                    child: _buildRoundedButton(context, '농가정보', () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (BuildContext context) => FarmInfoScreen(),
                         ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          flex: 1,
-                          child: _buildRoundedButton(context, '버튼 2', () {
-                            print('버튼 2 클릭');
-                          }),
-                        ),
-                      ],
-                    ),
+                      );
+                      print('버튼 2 클릭');
+                    }),
                   ),
+                  Spacer(flex: 1),
+                  Expanded(
+                    flex: 4,
+                    child: _buildRoundedButton(context, '버튼 2', () {
+                      print('버튼 2 클릭');
+                    }),
+                  ),
+                  Spacer(flex: 1),
+                  Expanded(
+                    flex: 5,
+                    child: _buildRoundedButton(context, '버튼 2', () {
+                      print('버튼 2 클릭');
+                    }),
+                  ),
+                  Spacer(flex: 2),
                 ],
               ),
             ),
           ),
           Expanded(
             flex: 2,
+            child: Row(
+              children: [
+                Spacer(flex: 2),
+                Expanded(
+                  flex: 5,
+                  child: _buildRoundedButton(context, '버튼 2', () {
+                    print('버튼 2 클릭');
+                  }),
+                ),
+                Spacer(flex: 1),
+                Expanded(
+                  flex: 5,
+                  child: _buildRoundedButton(context, '버튼 2', () {
+                    print('버튼 2 클릭');
+                  }),
+                ),
+                Spacer(flex: 1),
+                Expanded(
+                  flex: 5,
+                  child: _buildRoundedButton(context, '버튼 2', () {
+                    print('버튼 2 클릭');
+                  }),
+                ),
+                Spacer(flex: 1),
+                Expanded(
+                  flex: 5,
+                  child: _buildRoundedButton(context, '버튼 2', () {
+                    print('버튼 2 클릭');
+                  }),
+                ),
+                Spacer(flex: 1),
+                Expanded(
+                  flex: 5,
+                  child: _buildRoundedButton(context, '버튼 2', () {
+                    print('버튼 2 클릭');
+                  }),
+                ),
+                Spacer(flex: 2),
+              ],
+            ),
+          ),
+          Expanded(
+            flex: 4,
             child: Container(color: const Color.fromARGB(255, 255, 255, 255)),
           ),
         ],
@@ -241,7 +264,7 @@ Widget _buildRoundedButton(
         backgroundColor: Colors.white,
         foregroundColor: Colors.black87,
         elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8.0)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         padding: const EdgeInsets.symmetric(
           horizontal: 20,
           vertical: 12,

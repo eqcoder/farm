@@ -1,6 +1,5 @@
 import 'package:farm_data/business_trip/crop_photo.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
